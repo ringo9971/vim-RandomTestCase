@@ -21,9 +21,12 @@ function! RandomTestCase#RandomTestCase(...) abort
     let s:num += 1
   endwhile
 
+  echo 'start'
 
-  for i in range(1, 500)
-    let s:in = system('./random')
+  let s:i = 1
+  let s:cnt = 0
+  while v:true
+    let s:in   = system('./random')
     let s:out1 = system('echo ' . substitute(s:in, '\n', ' ', 'g') . ' | ./b')
     let s:out2 = system('echo ' . substitute(s:in, '\n', ' ', 'g') . ' | ./c')
 
@@ -31,14 +34,18 @@ function! RandomTestCase#RandomTestCase(...) abort
       call writefile([s:in],   'test/in'     . s:num)
       call writefile([s:out1], 'test/AC_out' . s:num)
       call writefile([s:out2], 'test/WA_out' . s:num)
-      echo s:in[:-1] . s:out1 . s:out2
+      echo 'WA'
       let s:num += 1
+      let s:cnt += 1
+      if s:cnt >= 5 || (s:i >= 500 && s:cnt >= 1)
+        break
+      endif
     endif
 
-    if i%100 == 0
-      echo i-100 . ' - ' . i . 'end'
+    if s:i%100 == 0
+      echo s:i-100 . ' - ' . s:i . ' end'
     endif
-  endfor
+  endwhile
 
   echo 'end'
 endfunction
@@ -49,9 +56,9 @@ function! RandomTestCase#check() abort
 
   let s:num = 1
   while filereadable('test/in' . s:num)
-    let s:in = join(readfile('test/in' . s:num, "\n"))
+    let s:in     = join(readfile('test/in'     . s:num, "\n"))
     let s:AC_out = join(readfile('test/AC_out' . s:num, "\n"))
-    let s:out = system('echo ' . substitute(s:in, '\n', ' ', 'g') . ' | ./a.out')
+    let s:out    = system('echo ' . substitute(s:in, '\n', ' ', 'g') . ' | ./a.out')
 
     if s:AC_out !=# s:out
       echo 'WA'

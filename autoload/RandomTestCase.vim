@@ -9,9 +9,9 @@ function! RandomTestCase#RandomTestCase(...) abort
     return
   endif
 
-  let s:a = system('g++ -std=gnu++17 -O2 ' . a:1 . '.cpp -o random')
-  let s:b = system('g++ -std=gnu++17 -O2 ' . a:2 . '.cpp -o b')
-  let s:c = system('g++ -std=gnu++17 -O2 ' . a:3 . '.cpp -o c')
+  call system('g++ -std=gnu++17 -O2 ' . a:1 . '.cpp -o random')
+  call system('g++ -std=gnu++17 -O2 ' . a:2 . '.cpp -o b')
+  call system('g++ -std=gnu++17 -O2 ' . a:3 . '.cpp -o c')
 
   let s:num = 1
   if !isdirectory('test')
@@ -41,6 +41,26 @@ function! RandomTestCase#RandomTestCase(...) abort
   endfor
 
   echo 'end'
+endfunction
+
+
+function! RandomTestCase#check() abort
+  call system('g++ -std=gnu++17 -O2 ' . expand('%'))
+
+  let s:num = 1
+  while filereadable('test/in' . s:num)
+    let s:in = join(readfile('test/in' . s:num, "\n"))
+    let s:AC_out = join(readfile('test/AC_out' . s:num, "\n"))
+    let s:out = system('echo ' . substitute(s:in, '\n', ' ', 'g') . ' | ./a.out')
+
+    if s:AC_out !=# s:out
+      echo 'WA'
+      return
+    endif
+    let s:num += 1
+  endwhile
+
+  echo 'AC'
 endfunction
 
 let &cpo = s:save_cpo

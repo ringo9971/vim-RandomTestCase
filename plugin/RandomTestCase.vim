@@ -9,7 +9,7 @@ endif
 let g:loaded_vim_RandomTestCase = 1
 
 command! -nargs=+ RandomTestCase call RandomTestCase#RandomTestCase(<f-args>)
-
+command! RandomTestCaseCheck call RandomTestCase#check()
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

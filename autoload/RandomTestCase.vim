@@ -17,7 +17,7 @@ function! RandomTestCase#RandomTestCase(...) abort
   if !isdirectory('test')
     call mkdir('test', 'p')
   endif
-  while exists('test/in' . s:num)
+  while filereadable('test/in' . s:num)
     let s:num += 1
   endwhile
 
@@ -53,6 +53,7 @@ endfunction
 
 function! RandomTestCase#check() abort
   call system('g++ -std=gnu++17 -O2 ' . expand('%'))
+  echo 'start'
 
   let s:num = 1
   while filereadable('test/in' . s:num)
@@ -61,13 +62,16 @@ function! RandomTestCase#check() abort
     let s:out    = system('echo ' . substitute(s:in, '\n', ' ', 'g') . ' | ./a.out')
 
     if s:AC_out !=# s:out
-      echo 'WA'
-      return
+      echo 'No.' . s:num  . ' WA'
+      echo 'input  : ' . s:in
+      echo 'AC_out : ' . s:AC_out
+      echo 'WA_out : ' . s:out . "\n"
+    else
+      echo 'No.' . s:num  . ' AC'
     endif
     let s:num += 1
   endwhile
-
-  echo 'AC'
+  echo 'end'
 endfunction
 
 let &cpo = s:save_cpo
